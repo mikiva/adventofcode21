@@ -13,20 +13,11 @@ example = [
 
 
 def part1(m):
-    i = 0
-    for k in range(len(m)):
-        i = i + 1 if ((m[k] - m[k - 1]) > 0) else i
-    return i
+    return sum([1 for k in range(len(m)) if ((m[k] - m[k - 1]) > 0)])
 
 
 def part2(m):
-    i = 0
-    for k in range(len(m) - 3):
-        a = m[k] + m[k + 1] + m[k + 2]
-        b = m[k + 1] + m[k + 2] + m[k + 3]
-        i = i + 1 if a < b else i
-
-    return i
+    return sum([1 for k in range(len(m)) if (sum(m[k:k + 3]) < sum(m[k + 1:k + 4]))])
 
 
 def solve():
