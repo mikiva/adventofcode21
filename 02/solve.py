@@ -11,7 +11,6 @@ ex = [
 def part1(i):
     hor, ver = 0, 0
     for d, v in i:
-        v = int(v)
         if d == "forward":
             hor += v
         elif d == "up":
@@ -25,7 +24,6 @@ def part1(i):
 def part2(i):
     hor, ver, aim = 0, 0, 0
     for d, v in i:
-        v = int(v)
         if d == "forward":
             hor += v
             ver += aim * v
@@ -39,7 +37,7 @@ def part2(i):
 
 def solve():
     i = [line for line in open("input.txt", "r")]
-    i = [tuple(map(str, d.split(" "))) for d in i]
+    i = [(d.split(" ")[0], int(d.split(" ")[1])) for d in i]
     part1(i)
     part2(i)
 
