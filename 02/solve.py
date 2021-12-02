@@ -10,27 +10,28 @@ ex = [
 
 def part1(i):
     hor, ver = 0, 0
-    for a in i:
-        if a[0] == "forward":
-            hor += int(a[1])
-        elif a[0] == "up":
-            ver -= int(a[1])
-        elif a[0] == "down":
-            ver += int(a[1])
+    for d, v in i:
+        v = int(v)
+        if d == "forward":
+            hor += v
+        elif d == "up":
+            ver -= v
+        elif d == "down":
+            ver += v
 
     print(hor * ver)
 
 
 def part2(i):
     hor, ver, aim = 0, 0, 0
-    for a in i:
-        v = int(a[1])
-        if a[0] == "forward":
+    for d, v in i:
+        v = int(v)
+        if d == "forward":
             hor += v
             ver += aim * v
-        elif a[0] == "up":
+        elif d == "up":
             aim -= v
-        elif a[0] == "down":
+        elif d == "down":
             aim += v
 
     print(hor * ver)
