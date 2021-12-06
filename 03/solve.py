@@ -15,6 +15,7 @@ ex = [
     "01010"
 ]
 
+from collections import Counter
 
 def part1(i):
     common, least = [], []

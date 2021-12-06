@@ -1,52 +1,27 @@
-from copy import copy
-from collections import defaultdict
-
-
-def part2(fish):
-    day = 0
-    fd = defaultdict(int)
+def generation(fish, p1, p2):
+    d1, d2 = 0, 0
+    nl = [0] * 10
     for f in fish:
-        fd[f] += 1
-    print(fd)
-    while day < 80:
-        nfd = copy(fd)
-        for k in fd.keys():
-            if k == 0:
-                if nfd[0] > 0:
-                    nfd[0] -= 1
-                    nfd[6] += 1
-                    nfd[8] += 1
-            elif k > 0:
-                if nfd[k] > 0:
-                    nfd[k] -= 1
-                    nfd[k - 1] += 1
-        fd = copy(nfd)
-        day += 1
-    print(fd)
-    print("p2: ", sum(fd.values()))
+        nl[f] += 1
+    for day in range(p2):
+        if day == p1:
+            d1 = sum(nl)
 
+        spawn = nl[0]
+        for k in range(9):
+            nl[k] = nl[k + 1]
 
-def part1(fish):
-    day = 0
-    while day < 80:
-        new_day = copy(fish)
-        for k, f in enumerate(fish):
-            if f == 0:
-                new_day.append(8)
-                new_day[k] = 6
-            else:
-                new_day[k] = f - 1
-        fish = copy(new_day)
-        day += 1
-    print("p1: ", len(fish))
+        nl[6] += spawn
+        nl[8] += spawn
+    d2 = sum(nl)
+    return d1, d2
 
 
 def solve():
-    with open("exinput.txt", "r") as inp:
+    with open("input.txt", "r") as inp:
         fish = [int(f) for f in inp.readline().split(",")]
 
-    part1(fish)
-    part2(fish)
+    print("p1: {}, p2: {}".format(*generation(fish, 80, 256)))
 
 
 if __name__ == '__main__':
