@@ -33,11 +33,9 @@ class Board:
             for b in bb:
                 if b[i].is_drawn:
                     col += 1
-                    # col = col + 1 if b[i].is_drawn else col
             if col == 5:
                 self.won = True
                 return True
-
         for b in bb:
             if sum([1 for bd in b if bd.is_drawn]) == 5:
                 self.won = True
