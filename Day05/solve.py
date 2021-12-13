@@ -39,7 +39,7 @@ class Line:
 
 def get_input() -> [Line]:
     i = [tuple(line.strip().split("->")) for line in open("input.txt", "r")]
-    lines = []
+    lines =[]
     for l in i:
         lines.append(Line(tuple(l[0].strip().split(',')), tuple(l[1].strip().split(','))))
     return lines
