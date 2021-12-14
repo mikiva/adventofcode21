@@ -11,27 +11,35 @@ def find_rule(t, pairs):
         if p[0] == t: return p[1]
     return None
 
-def part1(template, pairs, steps=10):
-    for _ in range(steps):
-        inserted = []
-        for i in range(len(template) - 1):
-            t, s = template[i], template[i + 1]
-            r = find_rule(f"{t}{s}", pairs)
-            if r:
-                inserted.append(f'{t}{r}')
-
-        inserted.append(template[-1])
-        template = "".join(inserted)
-
-    c = Counter(template).values()
-    return max(c) - min(c)
 
 
-def part2(template, rules, steps):
+"""
+part1 Arkvierad pga ung och naiv
+"""
+#def part1(template, pairs, steps=10):
+#    for _ in range(steps):
+#        inserted = []
+#        for i in range(len(template) - 1):
+#            t, s = template[i], template[i + 1]
+#            r = find_rule(f"{t}{s}", pairs)
+#            if r:
+#                inserted.append(f'{t}{r}')
+#
+#        inserted.append(template[-1])
+#        template = "".join(inserted)
+#
+#    c = Counter(template).values()
+#    return max(c) - min(c)
+
+
+
+def insertion(template, rules, steps):
     pc = Counter()
     for i in range(len(template) - 1):
         pc[template[i:i + 2]] += 1
-    for _ in range(steps):
+    for s in range(steps):
+        if s == 10:
+            print_count("p1", pc, template)
         n_pc = Counter()
         for pair, v in pc.items():
             l, r = pair[0], pair[1]
@@ -41,11 +49,17 @@ def part2(template, rules, steps):
                     n_pc[loc + r] += v
 
         pc = n_pc
+
+    print_count("p2", pc, template)
+
+def print_count(part, c, template):
     counts = Counter()
-    for k, v in pc.items():
+    for k, v in c.items():
         counts[k[0]] += v
     counts[template[-1]] += 1
-    return max(counts.values()) - min(counts.values())
+    solution = max(counts.values()) - min(counts.values())
+
+    print(f"{part}: {solution}")
 
 
 def read_input(file):
@@ -66,9 +80,7 @@ def read_input(file):
 
 def solve(file):
     t, p = read_input(file)
-    print("p1", part1(t, p, steps=10))
-    t, p = read_input(file)
-    print("p2", part2(t, p, steps=40))
+    insertion(t, p, steps=40)
 
 
 if __name__ == '__main__':
