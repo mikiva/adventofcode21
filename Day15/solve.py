@@ -1,134 +1,79 @@
-import sys
-
-
-def part1(ll):
-    finished = False
-    start = (0, 0)
-    current = start
-    steps = []
-
+import heapq
+from collections import defaultdict
 
 right = (0, 1)
 left = (0, -1)
 down = (1, 0)
 up = (-1, 0)
-end = ()
-start = (0, 0)
-lowest = sys.maxsize
 
 
-def find_path(ll, ex, ey):
-    c = [[0 for x in y] for y in ll]
-
-    c[0][0] = ll[0][0]
-
-
-def is_inside(ss, c):
-    return 0 <= c[0] < len(ss) and 0 <= c[1] < len(ss[0])
-
-
-def check_step(ss, c, seen):
-    # if is_out(ss, c):
-    #   return sys.maxsize
-    if c == end:
-        r = ss[c[0]][c[1]]
-        print(c)
-        print("RRR", r)
-        return r
-
-    seen.add(c)
-    risk = 0
-    # for i, s in enumerate(ss):
-    #    for j, t in enumerate(s):
-    #        risk += min(check_step(ss, (i + 1, j), seen), check_step(ss, (i, j + 1), seen))
-    # return risk
-    checks = []
-    tu, tl, tr, td = c, c, c, c
-    while len(checks) < 1:
-        tu = tuple(map(lambda i, j: i + j, c, up))
-        tl = tuple(map(lambda i, j: i + j, c, left))
-        tr = tuple(map(lambda i, j: i + j, c, right))
-        td = tuple(map(lambda i, j: i + j, c, down))
-        if is_inside(ss, tu) and tu not in seen:
-            # risk += check_step(ss, tu, seen)
-            checks.append(tu)
-        if is_inside(ss, td) and td not in seen:
-            # risk += check_step(ss, td, seen)
-            checks.append(td)
-        if is_inside(ss, tr) and tr not in seen:
-            # risk += check_step(ss, tr, seen)
-            checks.append(tr)
-        if is_inside(ss, tl) and tl not in seen:
-            # risk += check_step(ss, tl, seen)
-            checks.append(tl)
-        # print(checks, tu, tr, td, tl, c)
-        if not checks:
-            continue
-        return ss[c[0]][c[1]] + min([check_step(ss, st, seen) for st in checks])
+def get_neighbors(graph, c):
+    neighbors = []
+    for d in [up, down, left, right]:
+        nc = tuple(map(lambda i, j: i + j, c, d))
+        if nc in graph:
+            neighbors.append(nc)
+    return neighbors
 
 
-from collections import defaultdict
+def take_a_walk(graph, start, end):
+    path = []
+    heapq.heappush(path, (0, start))
+    current_risk = defaultdict(int)
+    current_risk[start] = 0
+    while path:
+        c = heapq.heappop(path)[1]
+        if c == end:
+            break
+
+        for neighbor in get_neighbors(graph, c):
+            nr = current_risk[c] + graph[neighbor]
+            if neighbor not in current_risk or nr < current_risk[neighbor]:
+                current_risk[neighbor] = nr
+                prio = nr
+                heapq.heappush(path, (prio, neighbor))
+
+    return current_risk[end]
 
 
-class Graph:
-    def __init__(self):
-        self.nodes = set()
-        self.edges = defaultdict(list)
+def expand_map(small):
+    y, x = len(small), len(small[0])
+    big = [[0] * (5 * x) for _ in range(5 * y)]
+    for row in range(5):
+        for col in range(5):
+            for r in range(y):
+                for c in range(x):
+                    nr, nc = y * row + r, x * col + c
+                    big[nr][nc] = small[r][c] + row + col
+                    if big[nr][nc] > 9:
+                        big[nr][nc] -= 9
 
-        self.distances = {}
-
-    def add_node(self, node):
-        self.nodes.add(node)
-
-    def add_edge(self, from_node, to_node, distance):
-        self.edges[from_node].append(to_node)
-        self.distances[(from_node, to_node)] = distance
-
-
-def minCost(cost, m, n, width, height):
-    #print(m,n, width, height)
-    if n > width or m > height:
-        return sys.maxsize
-    elif (m == width and n == height):
-        return cost[m][n]
-    else:
-        return cost[m][n] + min(minCost(cost, m + 1, n, width, height),
-                                minCost(cost, m, n + 1, width, height))
+    return big
 
 
-# A utility function that returns minimum of 3 integers */
-# def min(x, y, z):
-#    if (x < y):
-#        return x if (x < z) else z
-#    else:
-#        return y if (y < z) else z
+def build_graph(lines):
+    graph = defaultdict(int)
+    for y, line in enumerate(lines):
+        for x, cost in enumerate(line):
+            graph[(x, y)] = int(cost)
+
+    return graph
 
 
 def solve(file):
-    lines = []
-    with open(file, "r") as inp:
-        for line in inp:
-            lines.append([int(l) for l in [k for k in line.strip()]])
-
-    width = len(lines[0]) - 1
-    height = len(lines) - 1
-    global end
+    lines = [[int(x) for x in line.strip()] for line in open(file)]
     start = (0, 0)
-    x, y = width, height
-    end = (x, y)
-    empty_grid = [[0] * len(lines[0]) for _ in range(len(lines))]
+    graph = build_graph(lines)
+    end = (max(x for x, y in graph.keys()), max(y for x, y in graph.keys()))
+    risk = take_a_walk(graph, start, end)
+    print("p1", risk)
 
-    print(x, y)
-    cost = minCost(lines, 0, 0, width, height) - lines[0][0]
-    print(cost)
+    big_graph = build_graph(expand_map(lines))
+    end = (max(x for x, y in big_graph.keys()), max(y for x, y in big_graph.keys()))
+    risk = take_a_walk(big_graph, start, end)
+    print("p2", risk)
 
-#    risk = check_step(lines, start, set())
-#    print(risk)
-# find_path(lines, x, y)
-
-
-#    part1(lines)
 
 if __name__ == '__main__':
-    #solve("ex.txt")
+    # solve("ex.txt")
     solve("in.txt")
